@@ -7,8 +7,10 @@ Our blog has <%= Article.public_count %> articles and counting!
 <p><%= link_to "Sign out", destroy_user_session_path,
   method: :delete,
   data: { confirm: "Are you sure?" } %></p>
-<% end %>
-
+<% else %>
+<p><%= link_to "Sign up", new_user_registration_path %></p>
+<p><%= link_to "Sign in", new_user_session_path %></p>
+<% end %> 
 <ul>
   <% @articles.each do |article| %>
     <li>

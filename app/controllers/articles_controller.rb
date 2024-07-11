@@ -13,8 +13,12 @@ class ArticlesController < ApplicationController
   end
 
   def create
-    @article = Article.new(article_params)
-
+    if !user_signed_in?
+      flash[:notice] = "you need to sign in to create an article"
+      redirect_to new_user_session_path  and return
+    end
+    @user = current_user
+    @article = @user.articles.create(article_params)
     if @article.save
       redirect_to @article
     else
@@ -28,7 +32,10 @@ class ArticlesController < ApplicationController
 
   def update
     @article = Article.find(params[:id])
-
+    if @article.user_id!= current_user.id
+      flash[:notice] = "this is not your article to alter"
+      redirect_to @article  and return
+    end
     if @article.update(article_params)
       redirect_to @article
     else
@@ -39,6 +46,10 @@ class ArticlesController < ApplicationController
 
   def destroy
     @article = Article.find(params[:id])
+    if @article.user_id!= current_user.id
+      flash[:notice] = "this is not your article to alter"
+      redirect_to @article  and return
+    end
     @article.destroy
 
     redirect_to root_path
