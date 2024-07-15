@@ -28,7 +28,8 @@ gem 'jsonapi-serializer'
 # js stuff for jquery
 gem 'jquery-rails'
 gem 'rails-ujs'
-
+gem 'tailwindcss-rails'
+gem 'sprockets-rails'
 
 
 gem 'ffi', '~> 1.15.0'

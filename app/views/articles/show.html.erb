@@ -2,14 +2,14 @@
 
 <p><%= @article.body %></p>
 
-<ul>
+<ul class="p-5">
   <li><%= link_to "Edit", edit_article_path(@article) %></li>
   <li><%= link_to "Destroy", article_path(@article),
                   method: :delete,
                   data: { confirm: "Are you sure?" } %></li>
 </ul>
 
-<h2>Comments</h2>
+<h2 class="text-primary">Comments</h2>
 <%= render @article.comments %>
 
 <h2>Add a comment:</h2>

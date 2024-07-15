@@ -10,11 +10,12 @@ module Api
         private
   
         def authenticate_user!
+
           if request.headers['Authorization'].present?
             jwt_secret = Rails.application.credentials.dig(:jwt, :secret_key)
             jwt_payload = JWT.decode(request.headers['Authorization'].split(' ').last, 
                                      jwt_secret).first
-            @current_user_id = jwt_payload['sub']
+            @current_user_id = jwt_payload['id']
             @current_user_email = jwt_payload['email']
           else
             render json: { error: 'Authorization header missing' }, status: :unauthorized
@@ -22,7 +23,8 @@ module Api
         rescue JWT::ExpiredSignature, JWT::VerificationError, JWT::DecodeError
           render json: { error: 'Invalid or expired token' }, status: :unauthorized
         end
-  
+        
+        # TODO: doesn't funtion in create function
         def current_user
           @current_user ||= User.find(@current_user_id)
         end
