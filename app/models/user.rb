@@ -5,4 +5,7 @@ class User < ApplicationRecord
 
   has_many :articles
   has_many :comments
+  has_many :criticisms
+  has_many :votes
+  has_many :elaboration_requests
 end

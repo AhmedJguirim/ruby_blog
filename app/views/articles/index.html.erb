@@ -1,27 +1,30 @@
-<h1>Articles</h1>
-
-Our blog has <%= Article.public_count %> articles and counting!
-<% if user_signed_in? %>
-<p>
-<%= "hello " +  current_user.email %></p>
-<p><%= link_to "Sign out", destroy_user_session_path,
-  method: :delete,
-  data: { confirm: "Are you sure?" } %></p>
-<% else %>
-<p><%= link_to "Sign up", new_user_registration_path %></p>
-<p><%= link_to "Sign in", new_user_session_path %></p>
-<% end %> 
-<ul>
-  <% @articles.each do |article| %>
-    <li>
-      <%= link_to article.title, article %>
-    </li>
+<div>
+  <% if user_signed_in? %>
+    <p>Hello, <%= current_user.username %>!</p>
+    <%= link_to 'Sign Out', destroy_user_session_path, method: :delete %>
+  <% else %>
+    <%= link_to 'Sign Up', new_user_registration_path %>
+    <%= link_to 'Sign In', new_user_session_path %>
   <% end %>
-</ul>
+  <h1 class="text-3xl font-bold mb-6">Articles</h1>
 
-<%= link_to "New Article", new_article_path %>
-
-
+  <% if user_signed_in? %>
+    <%= link_to 'New Article', new_article_path, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mb-6 inline-block" %>
+  <% end %>
+  
+  <% @articles.each do |article| %>
+    <div class="mb-8 p-6 bg-white rounded-lg shadow-md">
+      <h2 class="text-2xl font-bold mb-2"><%= link_to article.title, article_path(article), class: "text-blue-600 hover:text-blue-800" %></h2>
+      <p class="text-gray-600 mb-2">By: <%= article.user.username %></p>
+      <p class="text-gray-800 mb-4"><%= article.summary %></p>
+      <p class="text-gray-600 mb-2">Status: <%= article.status %></p>
+      <div>
+        <% article.tags.each do |tag| %>
+          <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#<%= tag.name %></span>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
 
 
 

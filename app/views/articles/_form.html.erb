@@ -1,31 +1,39 @@
-<%= form_with model: article do |form| %>
-    <div>
-        <%= form.label :title %><br />
-            <%= form.text_field :title %>
-                <% article.errors.full_messages_for(:title).each do |message| %>
-                    <div>
-                        <%= message %>
-                    </div>
-                    <% end %>
+<!-- app/views/articles/_form.html.erb -->
+<%= form_with(model: article, local: true) do |form| %>
+  <% if article.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(article.errors.count, "error") %> prohibited this article from being saved:</h2>
+      <ul>
+        <% article.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
     </div>
+  <% end %>
 
-    <div>
-        <%= form.label :body %><br />
-            <%= form.text_area :body %><br />
-                <% article.errors.full_messages_for(:body).each do |message| %>
-                    <div>
-                        <%= message %>
-                    </div>
-                    <% end %>
-    </div>
+  <div class="mb-4">
+    <%= form.label :title, class: "block text-gray-700 text-sm font-bold mb-2" %>
+    <%= form.text_field :title, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+  </div>
 
-    <div>
-        <%= form.label :status %><br>
-        <%= form.select :status, ['public', 'private', 'archived'], selected: 'public' %>
-      </div>
-      
+  <div class="mb-4">
+    <%= form.label :summary, class: "block text-gray-700 text-sm font-bold mb-2" %>
+    <%= form.text_area :summary, rows: 3, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+    <small class="text-gray-600">Briefly summarize your article (max 200 characters)</small>
+  </div>
 
-    <div>
-        <%= form.submit %>
-    </div>
-    <% end %>
+  <div class="mb-4">
+    <%= form.label :body, class: "block text-gray-700 text-sm font-bold mb-2" %>
+    <%= form.text_area :body, rows: 10, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+    <small class="text-gray-600">Use #tag to add tags to your article (e.g., #ruby #rails)</small>
+  </div>
+
+  <div class="mb-4">
+    <%= form.label :status, class: "block text-gray-700 text-sm font-bold mb-2" %>
+    <%= form.select :status, ['public', 'private', 'archived'], {}, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" %>
+  </div>
+<% end %>

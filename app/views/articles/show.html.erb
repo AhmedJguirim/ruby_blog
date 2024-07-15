@@ -1,16 +1,26 @@
-<h1><%= @article.title %></h1>
+<!-- app/views/articles/show.html.erb -->
+<h1 class="text-2xl font-bold mb-4"><%= @article.title %></h1>
 
-<p><%= @article.body %></p>
+<p class="mb-4">By: <%= @article.user.username %></p>
+<p class="mb-4">Status: <%= @article.status %></p>
 
-<ul class="p-5">
-  <li><%= link_to "Edit", edit_article_path(@article) %></li>
-  <li><%= link_to "Destroy", article_path(@article),
-                  method: :delete,
-                  data: { confirm: "Are you sure?" } %></li>
-</ul>
+<div class="mb-4">
+  <h2 class="text-xl font-semibold">Summary:</h2>
+  <p><%= @article.summary %></p>
+</div>
 
-<h2 class="text-primary">Comments</h2>
-<%= render @article.comments %>
+<div class="mb-4">
+  <h2 class="text-xl font-semibold">Body:</h2>
+  <p><%= simple_format(@article.body) %></p>
+</div>
 
-<h2>Add a comment:</h2>
-<%= render 'comments/form' %>
+<div class="mb-4">
+  <h2 class="text-xl font-semibold">Tags:</h2>
+  <p>
+    <% @article.tags.each do |tag| %>
+      <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#<%= tag.name %></span>
+    <% end %>
+  </p>
+</div>
+
+<!-- ... rest of the view ... -->
