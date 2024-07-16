@@ -2,7 +2,7 @@ class Article < ApplicationRecord
   
     has_many :comments, dependent: :destroy
     has_many :elaboration_requests
-    has_many :votes, as: :votable
+    has_many :votes, as: :votable , dependent: :destroy
     belongs_to :user
     has_and_belongs_to_many :tags
     
@@ -11,6 +11,11 @@ class Article < ApplicationRecord
     validates :summary, presence: true
 
     after_save :process_tags
+
+    def vote_total
+      votes.sum(:value)
+    end
+    
     private 
 
     def process_tags

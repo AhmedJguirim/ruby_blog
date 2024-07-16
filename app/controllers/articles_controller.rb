@@ -1,5 +1,5 @@
 class ArticlesController < ApplicationController
-  before_action :set_article, only: [:show, :edit, :update, :destroy]
+  before_action :set_article, only: [:show, :edit, :update, :destroy, :upvote, :downvote]
   before_action :authenticate_user!, except: [:index, :show]
   before_action :ensure_ownership, only: [:edit, :update, :destroy]
 
@@ -40,6 +40,14 @@ class ArticlesController < ApplicationController
     redirect_to root_path, notice: 'Article was successfully destroyed.'
   end
 
+  def upvote
+    vote(1)
+  end
+
+  def downvote
+    vote(-1)
+  end
+
   private
 
   def set_article
@@ -53,6 +61,16 @@ class ArticlesController < ApplicationController
     end
   end
 
+  def vote(value)
+    @vote = @article.votes.find_or_initialize_by(user: current_user)
+    @vote.value = value
+
+    if @vote.save
+      redirect_back fallback_location: root_path, notice: 'Vote recorded successfully.'
+    else
+      redirect_back fallback_location: root_path, alert: 'Unable to record vote.'
+    end
+  end
 
   def article_params
     params.require(:article).permit(:title, :body, :summary)

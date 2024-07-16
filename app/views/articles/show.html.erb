@@ -1,4 +1,5 @@
 <!-- app/views/articles/show.html.erb -->
+
 <h1 class="text-2xl font-bold mb-4"><%= @article.title %></h1>
 
 <p class="mb-4">By: <%= @article.user.username %></p>
@@ -22,4 +23,48 @@
   </p>
 </div>
 
-<!-- ... rest of the view ... -->
+<div class="mb-4">
+  <h2 class="text-xl font-semibold">Votes:</h2>
+  <p>Total votes: <%= @article.vote_total %></p>
+  <% if user_signed_in? %>
+  <%= button_to 'Upvote', upvote_article_path(@article), method: :post, class: "bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2" %>
+  <%= button_to 'Downvote', downvote_article_path(@article), method: :post, class: "bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" %>
+<% end %>
+</div>
+
+<% if user_signed_in? && current_user.id == @article.user_id %>
+  <%= link_to 'Edit', edit_article_path(@article), class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2" %>
+  <%= link_to 'Delete', article_path(@article), method: :delete, data: { confirm: 'Are you sure?' }, class: "bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" %>
+<% end %>
+
+<h2 class="text-xl font-semibold mt-8 mb-4">Comments:</h2>
+
+<% @article.comments.each do |comment| %>
+  <div class="bg-gray-100 p-4 mb-4 rounded">
+    <p><%= comment.body %></p>
+    <p class="text-sm text-gray-600">By: <%= comment.user.username %></p>
+    <p class="text-sm text-gray-600">Votes: <%= comment.vote_total %></p>
+    <% if user_signed_in? %>
+  <%= button_to 'Upvote', upvote_article_comment_path(@article, comment), method: :post, class: "bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded mr-2 text-sm" %>
+  <%= button_to 'Downvote', downvote_article_comment_path(@article, comment), method: :post, class: "bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded text-sm" %>
+<% end %>
+    <% if user_signed_in? && current_user == comment.user %>
+      <%= link_to 'Edit', edit_article_comment_path(@article, comment), class: "text-blue-500 hover:text-blue-700" %>
+      <%= link_to 'Delete', article_comment_path(@article, comment), method: :delete, data: { confirm: 'Are you sure?' }, class: "text-red-500 hover:text-red-700" %>
+    <% end %>
+  </div>
+<% end %>
+
+<% if user_signed_in? %>
+  <h3 class="text-lg font-semibold mb-2">Add a comment:</h3>
+  <%= form_with(model: [@article, Comment.new], local: true, class: "mb-4") do |form| %>
+    <div class="mb-4">
+      <%= form.text_area :body, rows: 3, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+    </div>
+    <%= form.submit "Post Comment", class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" %>
+  <% end %>
+<% else %>
+  <p>Please <%= link_to 'sign in', new_user_session_path, class: "text-blue-500 hover:text-blue-700" %> to comment.</p>
+<% end %>
+
+<%= link_to 'Back to Articles', articles_path, class: "mt-4 inline-block text-blue-500 hover:text-blue-700" %>
