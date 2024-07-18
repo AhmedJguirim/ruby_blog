@@ -9,14 +9,27 @@ class CommentsController < ApplicationController
     @comment.user = current_user
 
     if @comment.save
+      if params[:comment][:image].present?
+        @comment.create_document(file: params[:comment][:image])
+      end
       redirect_to @article, notice: 'Comment was successfully created.'
     else
       redirect_to @article, alert: 'Error creating comment.'
     end
   end
 
+  def edit
+    
+  end
   def update
     if @comment.update(comment_params)
+      if params[:comment][:image].present?
+        if @comment.document.present?
+          @comment.document.update(file: params[:comment][:image])
+        else
+          @comment.create_document(file: params[:comment][:image])
+        end
+      end
       redirect_to @article, notice: 'Comment was successfully updated.'
     else
       render :edit
@@ -59,7 +72,6 @@ class CommentsController < ApplicationController
   def vote(value)
     @vote = @comment.votes.find_or_initialize_by(user: current_user)
     @vote.value = value
-
     if @vote.save
       redirect_back fallback_location: root_path, notice: 'Vote recorded successfully.'
     else

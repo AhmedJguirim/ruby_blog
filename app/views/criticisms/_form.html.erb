@@ -1,0 +1,7 @@
+<%= form_with(model: [comment, Criticism.new], url: article_comment_criticisms_path(@article, comment), local: true) do |form| %>
+      <div class="field">
+        <%= form.label :content, "Add a criticism" %>
+        <%= form.text_area :content %>
+      </div>
+        <%= form.submit "Submit Criticism" %>
+      <% end %>

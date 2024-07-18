@@ -1,17 +1,60 @@
-<p>
-    <strong>Commenter:</strong>
-    <%= comment.user_id %>
-  </p>
+<div class="flex">
+  <div class="flex flex-col items-center justify-center w-10">
+    <% if user_signed_in? %>
+     <%# https://stackoverflow.com/questions/10468094/adding-a-twitter-bootstrap-button-icon-to-button-to-in-rails
+    response 2
+    %>
+    <%
+      upvoted = comment.votes.any? { |v|  v.value == 1 }
+      downvoted = comment.votes.any? { |v|  v.value == -1 }
+    
+      upvote_class = " text-black font-bold rounded"
+      downvote_class = "text-black font-bold rounded"
+    
+      upvote_icon_class = "fa-solid fa-chevron-up fa-xl#{' text-blue-500' if upvoted}"
+      downvote_icon_class = "fa-solid fa-chevron-down fa-xl#{' text-blue-500' if downvoted}"
+    %>
+      <%= button_to upvote_article_comment_path(@article, comment), method: :post, class: upvote_class do %>
+        <i class="<%= upvote_icon_class %>" id="postup"></i>
+      <% end %>
+      <span class="text-gray-600 font-bold"><%= comment.vote_total %></span>
+      <%= button_to downvote_article_comment_path(@article, comment), method: :post, class: downvote_class do %>
+        <i class="<%= downvote_icon_class %>" id="postdown"></i>
+      <% end %>
+    <% end %>
+  </div>
   
-  <p>
-    <strong>Comment:</strong>
-    <%= comment.body %>
-  </p>
+  <div class="bg-gray-100 p-4 mb-4 rounded">
+    <p>
+      <%= comment.body %>
+    </p>
+    <% if comment.document.present? %>
+      <%= image_tag url_for(comment.document.file), style: "max-width: 200px; max-height: 200px;" %>
+    <% end %>
+    <p class="text-sm text-gray-600">By: <%= comment.user.username %></p>
+    <p class="text-sm text-gray-600">Votes: <%= comment.vote_total %></p>
   
-  <p>
-    <%= link_to 'Destroy Comment', [comment.article, comment],
-                method: :delete,
-                data: { confirm: "Are you sure?" } %>
-  </p>
+    <% if user_signed_in? && current_user==comment.user %>
+      <%= link_to 'Edit' , edit_article_comment_path(@article, comment),
+        class: "text-blue-500 hover:text-blue-700" %>
+      <%= link_to 'Delete' , article_comment_path(@article, comment), method: :delete, data: {
+        confirm: 'Are you sure?' }, class: "text-red-500 hover:text-red-700" %>
+    <% end %>
   
+      <h4>Criticisms:</h4>
+      <% comment.criticisms.each do |criticism| %>
+        <div class="criticism">
+          <p><%= criticism.content %></p>
+          <p>By: <%= criticism.user.username %></p>
+          <% if current_user==criticism.user %>
+            <%= link_to 'Delete' , article_comment_criticism_path(@article, comment,criticism), method: :delete, data: { confirm: 'Are you sure?' } %>
+          <% end %>
+        </div>
+      <% end %>
+  
+      <% if user_signed_in? %>
+      <%= render 'criticisms/form', comment: comment %>
+      <% end %>
+  </div>
+</div>
   

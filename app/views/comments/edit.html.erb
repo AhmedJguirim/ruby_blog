@@ -1,0 +1,37 @@
+<h1>Edit Comment</h1>
+
+<%= form_with(model: [@article, @comment], local: true) do |form| %>
+  <% if @comment.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@comment.errors.count, "error") %> prohibited this comment from being saved:</h2>
+      <ul>
+        <% @comment.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :body %>
+    <%= form.text_area :body %>
+  </div>
+
+  <div class="field">
+    <%= form.label :image %>
+    <%= form.file_field :image, accept: 'image/*' %>
+  </div>
+
+  <% if @comment.document&.file.attached? %>
+    <div>
+      <p>Current Image:</p>
+      <%= image_tag url_for(@comment.document.file), style: "max-width: 200px; max-height: 200px;" %>
+    </div>
+  <% end %>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>
+
+<%= link_to 'Back to Article', @article %>

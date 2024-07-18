@@ -4,10 +4,17 @@ class ArticlesController < ApplicationController
   before_action :ensure_ownership, only: [:edit, :update, :destroy]
 
   def index
-    @articles = Article.all
+    @articles = Article.all.order(created_at: :desc)
+    @votes = Vote.where(user: current_user , votable_type: "Article")
+
+    return @articles, @votes
   end
 
   def show
+    tag_names = @article.tags.pluck(:name)
+    #getting articles with same tags (at least 1) as the current article
+    @articles = Article.joins(:tags).where(tags: { name: tag_names }).where.not(id: @article.id).distinct.take(5)
+    return @articles, @article
   end
 
   def new
@@ -16,8 +23,13 @@ class ArticlesController < ApplicationController
 
   def create
     @article = current_user.articles.build(article_params)
-    
+
     if @article.save
+      if params[:article][:images].present?
+        params[:article][:images].first(3).each do |image|
+          @article.documents.create(file: image)
+        end
+      end
       redirect_to @article, notice: 'Article was successfully created.'
     else
       render :new
@@ -28,7 +40,18 @@ class ArticlesController < ApplicationController
   end
 
   def update
-    if @article.update(article_params)
+    @article.assign_attributes(article_params)
+    
+    if params[:article][:images].present?
+      remaining_slots = 3 - @article.documents.count
+      new_images = params[:article][:images].first(remaining_slots)
+      
+      new_images.each do |image|
+        @article.documents.build(file: image)
+      end
+    end
+  
+    if @article.save
       redirect_to @article, notice: 'Article was successfully updated.'
     else
       render :edit

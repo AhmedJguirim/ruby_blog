@@ -1,14 +1,13 @@
-<%= form_with model: [ @article, @article.comments.build ] do |form| %>
-  <p>
-    <%= form.label :body %><br>
+<%= form_with(model: [@article, Comment.new], local: true) do |form| %>
+<div class="field">
+  <%= form.label :body %>
     <%= form.text_area :body %>
-  </p>
-  <p>
-    <%= form.label :status %><br>
-    <%= form.select :status, ['public', 'private', 'archived'], selected: 'public' %>
-  </p>
-  
-  <p>
-    <%= form.submit %>
-  </p>
-<% end %>
+</div>
+<div class="field">
+  <%= form.label :image %>
+    <%= form.file_field :image, accept: 'image/*' %>
+</div>
+
+
+<%= form.submit "Post Comment" %>
+  <% end %>

@@ -7,7 +7,34 @@
 <% end %>
 
 <% @articles.each do |article| %>
-  <div class="mb-8 p-6 bg-white rounded-lg shadow-md">
+  <div class="mb-8 p-6 bg-white rounded-lg shadow-md flex">
+    <div class="flex flex-col items-center justify-center w-10">
+      <% if user_signed_in? %>
+  <%# https://stackoverflow.com/questions/10468094/adding-a-twitter-bootstrap-button-icon-to-button-to-in-rails
+      response 2
+      %>
+  
+      <%
+      upvoted = @votes.any? { |v|  v.votable_id == article.id && v.value == 1 }
+      downvoted = @votes.any? { |v|  v.votable_id == article.id && v.value == -1 }
+    
+      upvote_class = " text-black font-bold rounded"
+      downvote_class = "text-black font-bold rounded"
+    
+      upvote_icon_class = "fa-solid fa-chevron-up fa-xl#{' text-blue-500' if upvoted}"
+      downvote_icon_class = "fa-solid fa-chevron-down fa-xl#{' text-blue-500' if downvoted}"
+    %>
+    
+    <%= button_to upvote_article_path(article), method: :post, class: upvote_class do %>
+      <i class="<%= upvote_icon_class %>" id="postup"></i>
+    <% end %>
+    <span class="text-gray-600 font-bold"><%= article.vote_total %></span>
+    <%= button_to downvote_article_path(article), method: :post, class: downvote_class do %>
+      <i class="<%= downvote_icon_class %>" id="postdown"></i>
+    <% end %>
+  <% end %>
+  </div>
+    <div class="border-l-1 border-gray-500 pl-4 shadow-[inset_8px_0px_8px_-8px_rgba(0,0,0,0.3)]">
     <h2 class="text-2xl font-bold mb-2"><%= link_to article.title, article_path(article), class: "text-blue-600 hover:text-blue-800" %></h2>
     <p class="text-gray-600 mb-2">By: <%= article.user.username %></p>
     <p class="text-gray-800 mb-4"><%= article.summary %></p>
@@ -16,11 +43,9 @@
         <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#<%= tag.name %></span>
       <% end %>
     </div>
-    <p class="text-gray-600 mb-2">Votes: <%= article.vote_total %></p>
-    <% if user_signed_in? %>
-  <%= button_to 'Upvote', upvote_article_path(article), method: :post, class: "bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2" %>
-  <%= button_to 'Downvote', downvote_article_path(article), method: :post, class: "bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" %>
-<% end %>
     <p class="text-gray-600 mt-2">Comments: <%= article.comments.count %></p>
+  </div>
+
+    
   </div>
 <% end %>

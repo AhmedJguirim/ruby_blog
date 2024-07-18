@@ -3,12 +3,15 @@ class Article < ApplicationRecord
     has_many :comments, dependent: :destroy
     has_many :elaboration_requests
     has_many :votes, as: :votable , dependent: :destroy
+    has_many :documents, as: :documentable, dependent: :destroy
+
     belongs_to :user
     has_and_belongs_to_many :tags
     
     validates :title, presence: true
     validates :body, presence: true, length: { minimum: 10 }
     validates :summary, presence: true
+    validate :document_limit
 
     after_save :process_tags
 
@@ -16,7 +19,17 @@ class Article < ApplicationRecord
       votes.sum(:value)
     end
     
+    def images=(array_of_files)
+      array_of_files.each do |file|
+        documents.build(file: file) if file.is_a?(ActionDispatch::Http::UploadedFile)
+      end
+    end
     private 
+    def document_limit
+      if documents.count > 3
+        errors.add(:base, "You can't upload more than 3 images")
+      end
+    end
 
     def process_tags
       # Extract tags from the body

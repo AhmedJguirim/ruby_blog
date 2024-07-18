@@ -1,5 +1,5 @@
 <!-- app/views/articles/_form.html.erb -->
-<%= form_with(model: article, local: true) do |form| %>
+<%= form_with(model: @article, local: true, multipart: true) do |form| %>
   <% if article.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(article.errors.count, "error") %> prohibited this article from being saved:</h2>
@@ -27,8 +27,56 @@
     <%= form.text_area :body, rows: 10, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
     <small class="text-gray-600">Use #tag to add tags to your article (e.g., #ruby #rails)</small>
   </div>
-  
+
+  <div class="field">
+    <%= form.label :images %>
+    <% if @article.documents.count < 3 %>
+      <%= form.file_field :images, multiple: true, accept: 'image/*' %>
+      <small>You can upload up to <%= 3 - @article.documents.count %> more image(s)</small>
+    <% else %>
+      <p>You've reached the maximum number of images (3)</p>
+    <% end %>
+  </div>
   <div class="actions">
     <%= form.submit class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" %>
   </div>
+<% end %>
+
+<div id="images">
+  <% article.documents.each do |document| %>
+    <div>
+      <%= image_tag url_for(document.file), style: "max-width: 200px; max-height: 200px;" %>
+      <%= link_to 'Delete', article_document_path(article, document), method: :delete, data: { confirm: 'Are you sure?' } %>
+    </div>
+  <% end %>
+</div>
+
+<% if article.persisted? && article.documents.count < 3 %>
+
+
+
+
+  <script>   
+  $(function() {
+    $('input[type="file"]').fileupload({
+      dataType: 'json',
+      add: function(e, data) {
+        var uploadedFiles = $('#images > div').length;
+        var filesToUpload = data.files.length;
+        if (uploadedFiles + filesToUpload > 3) {
+          alert("You can't upload more than 3 images in total.");
+          return false;
+        }
+        data.submit();
+      },
+      done: function(e, data) {
+        $('#images').append('<div><img src="' + data.result.file.url + '" style="max-width: 200px; max-height: 200px;"></div>');
+        if ($('#images > div').length >= 3) {
+          $('input[type="file"]').prop('disabled', true);
+          $('.field small').text("You've reached the maximum number of images (3)");
+        }
+      }
+    });
+  });
+  </script>
 <% end %>
