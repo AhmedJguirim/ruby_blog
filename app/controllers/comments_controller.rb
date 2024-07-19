@@ -12,9 +12,9 @@ class CommentsController < ApplicationController
       if params[:comment][:image].present?
         @comment.create_document(file: params[:comment][:image])
       end
-      redirect_to @article, notice: 'Comment was successfully created.'
+      redirect_to "#{article_path(@article)}#comment-section", notice: 'Comment was successfully created.'
     else
-      redirect_to @article, alert: 'Error creating comment.'
+      redirect_to "#{article_path(@article)}#comment-section", alert: 'Error creating comment.'
     end
   end
 
@@ -29,6 +29,8 @@ class CommentsController < ApplicationController
         else
           @comment.create_document(file: params[:comment][:image])
         end
+      else
+        @comment.document.destroy
       end
       redirect_to @article, notice: 'Comment was successfully updated.'
     else

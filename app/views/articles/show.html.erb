@@ -24,7 +24,7 @@
 </div>
 </header>
 <div class="grid grid-cols-1 lg:grid-cols-3 px-12 lg:px-0 gap-2 lg:gap-6 mt-10">
-  <section class="mb-4 col-span-2">
+  <section class="mb-4 col-span-2 break-words w-full overflow-hidden bg-amber-100 p-5 rounded ">
     <p id="theory-body"><%= simple_format(@article.body) %></p>
     <section class="mt-5">
       <div class="mb-4 article-images grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
@@ -78,13 +78,13 @@
   </section>
   </section>
   </section>
-  <div class="md:grid md:grid-cols-2 md:justify-center lg:block lg:text-center flex flex-col items-center">
+  <div class="md:grid md:grid-cols-2 md:justify-center lg:block lg:text-center  flex flex-col items-center">
     <h3 class="text-2xl mb-2 px-2 col-span-2"><strong>Similar Theories</strong> </h3>
     <%= render @articles %>
   </div>
 </div>
   <div >
-    <div class="bg-white p-5 rounded">
+    <div id="comment-section" class="bg-white p-5 lg:m-0 m-5 rounded">
     <h2 class="text-xl font-semibold mb-4">Comments:</h2>
     <% if @article.comments.any? %>
       <%= render @article.comments.sort_by { |comment| -comment.vote_total } %>
@@ -108,6 +108,6 @@
   <% end %>
 </div>
   <%= link_to 'Back to Articles' , articles_path,
-            class: "mt-4 inline-block text-orange-500 hover:text-orange-700" %>
+            class: "mt-4 inline-block text-orange-500 hover:text-orange-700 mb-4" %>
 </div>
 </div>
