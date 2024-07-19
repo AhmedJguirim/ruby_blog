@@ -8,8 +8,9 @@
     <%= csp_meta_tag %>
  
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    
     <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/42.0.1/ckeditor5.css" />
-
     
     <link rel="icon" type="image/x-icon" href="images/favicon.ico" />
     <script src="https://kit.fontawesome.com/64585f28ed.js" crossorigin="anonymous"></script>
@@ -25,7 +26,7 @@
     <%= javascript_include_tag "application" %>
 </head>
 
-<body>
+<body class="bg-orange-200">
   <!-- added for devise -->
   <%= render 'components/nav' %>
   <p class="notice">

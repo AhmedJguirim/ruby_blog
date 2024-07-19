@@ -8,9 +8,9 @@ class Article < ApplicationRecord
     belongs_to :user
     has_and_belongs_to_many :tags
     
-    validates :title, presence: true
-    validates :body, presence: true, length: { minimum: 10 }
-    validates :summary, presence: true
+    validates :title, presence: true, length: {minimum:10, maximum:90}
+    validates :body, presence: true, length: { minimum: 75 }
+    validates :summary, presence: true, length: {minimum:25, maximum:200}
     validate :document_limit
 
     after_save :process_tags

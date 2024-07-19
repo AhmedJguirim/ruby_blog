@@ -1,9 +1,8 @@
 
 
-<div class="block max-w-sm px-6 py-2 ">
-
-  <a class="mb-2 hover:underline under decoration-orange-500 text-lg font-bold tracking-tight text-gray-900 " href="#"> <%= article.title %></a>
-    <p class="font-sm text-gray-700 mt-2"><%= article.created_at.strftime('%d, %B %Y') %></p>
+<div class="block max-w-sm px-6 py-2 text-center md:text-left ">
+  <%= link_to article.title, article_path(article), class: "mb-2 hover:underline under decoration-orange-500 text-lg font-bold tracking-tight text-gray-900 " %>
+    <p class="font-sm text-gray-700 mt-2"><%= article.created_at.strftime('%d %B, %Y') %></p>
 </div>
     
     

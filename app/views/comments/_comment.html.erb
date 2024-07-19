@@ -1,60 +1,71 @@
-<div class="flex">
-  <div class="flex flex-col items-center justify-center w-10">
+<div class="flex space-x-4 mb-6">
+  <div class="flex flex-col items-center justify-start w-10">
     <% if user_signed_in? %>
-     <%# https://stackoverflow.com/questions/10468094/adding-a-twitter-bootstrap-button-icon-to-button-to-in-rails
-    response 2
-    %>
-    <%
-      upvoted = comment.votes.any? { |v|  v.value == 1 }
-      downvoted = comment.votes.any? { |v|  v.value == -1 }
-    
-      upvote_class = " text-black font-bold rounded"
-      downvote_class = "text-black font-bold rounded"
-    
-      upvote_icon_class = "fa-solid fa-chevron-up fa-xl#{' text-blue-500' if upvoted}"
-      downvote_icon_class = "fa-solid fa-chevron-down fa-xl#{' text-blue-500' if downvoted}"
-    %>
+      <%
+        upvoted = comment.votes.any? { |v| v.user_id == current_user.id && v.value == 1 }
+        downvoted = comment.votes.any? { |v| v.user_id == current_user.id && v.value == -1 }
+        upvote_class = "text-gray-400 hover:text-blue-500 transition-colors duration-200"
+        downvote_class = "text-gray-400 hover:text-blue-500 transition-colors duration-200"
+        upvote_icon_class = "fa-solid fa-chevron-up fa-lg #{upvoted ? 'text-blue-500' : ''}"
+        downvote_icon_class = "fa-solid fa-chevron-down fa-lg #{downvoted ? 'text-blue-500' : ''}"
+      %>
       <%= button_to upvote_article_comment_path(@article, comment), method: :post, class: upvote_class do %>
         <i class="<%= upvote_icon_class %>" id="postup"></i>
       <% end %>
-      <span class="text-gray-600 font-bold"><%= comment.vote_total %></span>
+      <span class="text-gray-700 font-semibold my-1"><%= comment.vote_total %></span>
       <%= button_to downvote_article_comment_path(@article, comment), method: :post, class: downvote_class do %>
         <i class="<%= downvote_icon_class %>" id="postdown"></i>
       <% end %>
     <% end %>
   </div>
   
-  <div class="bg-gray-100 p-4 mb-4 rounded">
-    <p>
-      <%= comment.body %>
-    </p>
-    <% if comment.document.present? %>
-      <%= image_tag url_for(comment.document.file), style: "max-width: 200px; max-height: 200px;" %>
-    <% end %>
-    <p class="text-sm text-gray-600">By: <%= comment.user.username %></p>
-    <p class="text-sm text-gray-600">Votes: <%= comment.vote_total %></p>
-  
-    <% if user_signed_in? && current_user==comment.user %>
-      <%= link_to 'Edit' , edit_article_comment_path(@article, comment),
-        class: "text-blue-500 hover:text-blue-700" %>
-      <%= link_to 'Delete' , article_comment_path(@article, comment), method: :delete, data: {
-        confirm: 'Are you sure?' }, class: "text-red-500 hover:text-red-700" %>
-    <% end %>
-  
-      <h4>Criticisms:</h4>
-      <% comment.criticisms.each do |criticism| %>
-        <div class="criticism">
-          <p><%= criticism.content %></p>
-          <p>By: <%= criticism.user.username %></p>
-          <% if current_user==criticism.user %>
-            <%= link_to 'Delete' , article_comment_criticism_path(@article, comment,criticism), method: :delete, data: { confirm: 'Are you sure?' } %>
+  <div class="flex-grow">
+    <div class="bg-white shadow-md rounded-lg p-4 mb-4">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-sm font-medium text-gray-600"><%= comment.user.username %></span>
+        <span class="text-xs text-gray-500"><%= time_ago_in_words(comment.created_at) %> ago</span>
+      </div>
+      <p class="text-gray-800 mb-3"><%= comment.body %></p>
+      <% if comment.document.present? %>
+        <%= image_tag url_for(comment.document.file), class: "max-h-80 h-auto rounded-lg mb-3" %>
+      <% end %>
+      
+      <div class="flex items-center justify-between text-sm">
+        <div class="flex space-x-2">
+          <% if user_signed_in? && current_user == comment.user %>
+            <%= link_to 'Edit', edit_article_comment_path(@article, comment),
+                class: "text-blue-500 hover:text-blue-700 transition-colors duration-200" %>
+            <%= link_to 'Delete', article_comment_path(@article, comment), method: :delete,
+                data: { confirm: 'Are you sure?' },
+                class: "text-red-500 hover:text-red-700 transition-colors duration-200" %>
           <% end %>
         </div>
+        <button class="text-gray-500 hover:text-gray-700 transition-colors duration-200" onclick="toggleCriticisms(this)">
+          Show Criticisms (<%= comment.criticisms.count %>)
+        </button>
+      </div>
+    </div>
+    
+    <div class="criticisms hidden ml-4">
+      <h4 class="text-lg font-semibold mb-2">Criticisms:</h4>
+      <%# this is needed cuse the partial needs comments and articles as well as the criticism %>
+      <% comment.criticisms.each do |criticism| %>
+        <%= render partial: 'criticisms/criticism', locals: { criticism: criticism, comment: comment, article: @article } %>
       <% end %>
-  
+      
       <% if user_signed_in? %>
-      <%= render 'criticisms/form', comment: comment %>
+        <%= render 'criticisms/form', comment: comment %>
       <% end %>
+    </div>
   </div>
 </div>
-  
+
+<script>
+function toggleCriticisms(button) {
+  const criticismsDiv = button.closest('.flex-grow').querySelector('.criticisms');
+  criticismsDiv.classList.toggle('hidden');
+  button.textContent = button.textContent.includes('Show') ? 
+    `Hide Criticisms (${button.textContent.match(/\d+/)[0]})` : 
+    `Show Criticisms (${button.textContent.match(/\d+/)[0]})`;
+}
+</script>

@@ -13,7 +13,14 @@ class ArticlesController < ApplicationController
   def show
     tag_names = @article.tags.pluck(:name)
     #getting articles with same tags (at least 1) as the current article
-    @articles = Article.joins(:tags).where(tags: { name: tag_names }).where.not(id: @article.id).distinct.take(5)
+    @articles = Article.joins(:tags)
+    .where('tags.name IN (?)', tag_names)
+    .where.not(id: @article.id)
+    .group('articles.id')
+    .having('COUNT(DISTINCT tags.id) >= 1')
+    .distinct
+    .order('RANDOM()')
+    .limit(5)
     return @articles, @article
   end
 

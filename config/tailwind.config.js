@@ -15,7 +15,7 @@ module.exports = {
         },
         fontFamily: {
           'heading': ['Georgia', 'Times New Roman', 'serif'],
-          'body': ['Arial', 'Helvetica', 'sans-serif'],
+          'body': ['Inter var', 'Helvetica', 'sans-serif'],
           'code': ['Courier New', 'Courier', 'monospace'],
           'accent': ['Trebuchet MS', 'sans-serif'],
         },
