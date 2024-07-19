@@ -1,4 +1,4 @@
-<%= form_with(model: [@article, Comment.new], local: true, class: "mt-8 space-y-6") do |form| %>
+<%= form_with(model: [article, comment], local: true, class: "mt-8 space-y-6") do |form| %>
   <div class="rounded-md shadow-sm -space-y-px">
     <div class="mb-4">
       <%= form.label :body, class: "sr-only" %>
@@ -24,16 +24,16 @@
     </div>
   </div>
   
-  <!-- Image preview container -->
-  <div id="image-preview" class="mt-4 hidden">
-    <img id="preview" src="#" alt="Preview" class="max-h-80 h-auto rounded-lg shadow-lg" />
+  <% #removing the existing image doesn't work, could try again %>
+  <div id="image-preview" class="mt-4 <%= 'hidden' unless comment.document&.file&.attached? %>">
+    <img id="preview" src="<%= comment.document&.file&.attached? ? url_for(comment.document.file) : '#' %>" alt="Preview" class="max-h-80 h-auto rounded-lg shadow-lg" />
     <button type="button" onclick="removeImage();" class="mt-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
       Remove Image
     </button>
   </div>
 
   <div>
-    <%= form.submit "Post Comment", class: "group relative w-full flex justify-center py-2 px-4 border border-transparent cursor-pointer text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500" %>
+    <%= form.submit comment.new_record? ? "Post Comment" : "Update Comment", class: "group relative w-full flex justify-center py-2 px-4 border border-transparent cursor-pointer text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500" %>
   </div>
 <% end %>
 
@@ -63,4 +63,18 @@
     preview.src = '#';
     previewContainer.classList.add('hidden');
   }
+
+  // Initialize image preview if an image is already attached
+  document.addEventListener('DOMContentLoaded', function() {
+    var previewContainer = document.getElementById('image-preview');
+    if (!previewContainer.classList.contains('hidden')) {
+      var removeButton = previewContainer.querySelector('button');
+      removeButton.addEventListener('click', function(event) {
+        event.preventDefault();
+        if (confirm('Are you sure you want to remove this image?')) {
+          removeImage();
+        }
+      });
+    }
+  });
 </script>

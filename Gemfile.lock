@@ -128,6 +128,18 @@ GEM
       activesupport (>= 4.2)
     jwt (2.8.2)
       base64
+    kaminari (1.2.2)
+      activesupport (>= 4.1.0)
+      kaminari-actionview (= 1.2.2)
+      kaminari-activerecord (= 1.2.2)
+      kaminari-core (= 1.2.2)
+    kaminari-actionview (1.2.2)
+      actionview
+      kaminari-core (= 1.2.2)
+    kaminari-activerecord (1.2.2)
+      activerecord
+      kaminari-core (= 1.2.2)
+    kaminari-core (1.2.2)
     listen (3.9.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
@@ -318,6 +330,7 @@ DEPENDENCIES
   jbuilder (~> 2.7)
   jquery-rails
   jsonapi-serializer
+  kaminari
   listen (~> 3.3)
   puma (~> 5.0)
   rack-mini-profiler (~> 2.0)

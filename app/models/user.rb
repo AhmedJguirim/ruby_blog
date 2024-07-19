@@ -8,4 +8,12 @@ class User < ApplicationRecord
   has_many :criticisms
   has_many :votes
   has_many :elaboration_requests
+
+  def total_votes_received
+    articles.sum { |article| article.votes.sum(:value) }
+  end
+
+  def total_comments_received
+    articles.sum { |article| article.comments.count }
+  end
 end

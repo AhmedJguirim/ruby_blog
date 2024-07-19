@@ -31,6 +31,8 @@ gem 'rails-ujs'
 gem 'tailwindcss-rails'
 gem 'sprockets-rails'
 
+# pagination
+gem 'kaminari'
 
 gem 'ffi', '~> 1.15.0'
 

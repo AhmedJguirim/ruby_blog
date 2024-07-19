@@ -60,8 +60,8 @@
           upvote_class = " text-black font-bold rounded mx-2"
           downvote_class = "text-black font-bold rounded mx-2"
         
-          upvote_icon_class = "fa-solid fa-chevron-up fa-xl#{' text-blue-500' if upvoted}"
-          downvote_icon_class = "fa-solid fa-chevron-down fa-xl#{' text-blue-500' if downvoted}"
+          upvote_icon_class = "fa-solid fa-chevron-up fa-xl#{' text-orange-500' if upvoted}"
+          downvote_icon_class = "fa-solid fa-chevron-down fa-xl#{' text-orange-500' if downvoted}"
         %>
         
         <%= button_to upvote_article_path(@article), method: :post, class: upvote_class do %>
@@ -104,10 +104,10 @@
     <%= render 'comments/form' %>
   <% else %>
     <p>Please <%= link_to 'sign in' , new_user_session_path,
-        class: "text-blue-500 hover:text-blue-700" %> to comment.</p>
+        class: "text-orange-500 hover:text-orange-700" %> to comment.</p>
   <% end %>
 </div>
   <%= link_to 'Back to Articles' , articles_path,
-            class: "mt-4 inline-block text-blue-500 hover:text-blue-700" %>
+            class: "mt-4 inline-block text-orange-500 hover:text-orange-700" %>
 </div>
 </div>

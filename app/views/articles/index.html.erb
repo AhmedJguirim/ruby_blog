@@ -1,51 +1,43 @@
-<!-- app/views/articles/index.html.erb -->
-
-<h1 class="text-3xl font-bold mb-6">Articles</h1>
-
-<% if user_signed_in? %>
-  <%= link_to 'New Article', new_article_path, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mb-6 inline-block" %>
-<% end %>
-
-<% @articles.each do |article| %>
-  <div class="mb-8 p-6 bg-white rounded-lg shadow-md flex">
-    <div class="flex flex-col items-center justify-center w-10">
-      <% if user_signed_in? %>
-  <%# https://stackoverflow.com/questions/10468094/adding-a-twitter-bootstrap-button-icon-to-button-to-in-rails
-      response 2
-      %>
-  
-      <%
-      upvoted = @votes.any? { |v|  v.votable_id == article.id && v.value == 1 }
-      downvoted = @votes.any? { |v|  v.votable_id == article.id && v.value == -1 }
-    
-      upvote_class = " text-black font-bold rounded"
-      downvote_class = "text-black font-bold rounded"
-    
-      upvote_icon_class = "fa-solid fa-chevron-up fa-xl#{' text-blue-500' if upvoted}"
-      downvote_icon_class = "fa-solid fa-chevron-down fa-xl#{' text-blue-500' if downvoted}"
-    %>
-    
-    <%= button_to upvote_article_path(article), method: :post, class: upvote_class do %>
-      <i class="<%= upvote_icon_class %>" id="postup"></i>
-    <% end %>
-    <span class="text-gray-600 font-bold"><%= article.vote_total %></span>
-    <%= button_to downvote_article_path(article), method: :post, class: downvote_class do %>
-      <i class="<%= downvote_icon_class %>" id="postdown"></i>
-    <% end %>
-  <% end %>
-  </div>
-    <div class="border-l-1 border-gray-500 pl-4 shadow-[inset_8px_0px_8px_-8px_rgba(0,0,0,0.3)]">
-    <h2 class="text-2xl font-bold mb-2"><%= link_to article.title, article_path(article), class: "text-blue-600 hover:text-blue-800" %></h2>
-    <p class="text-gray-600 mb-2">By: <%= article.user.username %></p>
-    <p class="text-gray-800 mb-4"><%= article.summary %></p>
-    <div class="mb-2">
-      <% article.tags.each do |tag| %>
-        <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#<%= tag.name %></span>
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold">
+      <% if @tag %>
+        Theories tagged with "<%= @tag.name %>"
+      <% else %>
+        All Theories
+      <% end %>
+    </h1>
+    <div class="flex items-center">
+      <%= link_to articles_path(view: 'list'), class: "mr-2 p-2 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400", remote: true, id: "list-view" do %>
+        <i class="fas fa-list"></i>
+      <% end %>
+      <%= link_to articles_path(view: 'card'), class: "p-2 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400", remote: true, id: "card-view" do %>
+        <i class="fas fa-th-large"></i>
       <% end %>
     </div>
-    <p class="text-gray-600 mt-2">Comments: <%= article.comments.count %></p>
   </div>
 
-    
+  <% if @articles.any? %>
+    <% if user_signed_in? %>
+      <%= link_to 'New Theory', new_article_path, class: "bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mb-6 inline-block" %>
+    <% end %>
+
+    <div id="theories-container" class="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-fr">
+      <%= render partial: 'theory_card_item', collection: @articles, as: :theory %>
+    </div>
+
+    <div class="mt-8">
+      <%= paginate @articles %>
+    </div>
+  <% else %>
+    <p class="text-gray-600 text-center py-8">No theories found for this tag.</p>
+  <% end %>
+  <div class="mb-6 mt-4">
+    <h2 class="text-xl font-semibold mb-2">Top Tags:</h2>
+    <div>
+      <% @top_tags.each do |tag| %>
+        <%= link_to "##{tag.name}", articles_path(tag: tag.name), class: "inline-block bg-orange-200 bg-white text-orange-800 rounded-full px-3 py-1 text-sm font-semibold mr-2 mb-2 hover:bg-orange-300 transition-colors duration-200" %>
+      <% end %>
+    </div>
   </div>
-<% end %>
+</div>

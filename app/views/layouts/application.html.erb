@@ -28,7 +28,9 @@
 
 <body class="bg-orange-200">
   <!-- added for devise -->
-  <%= render 'components/nav' %>
+  <% if user_signed_in? %>
+    <%= render 'components/nav' %>
+  <% end %>
   <p class="notice">
     <%= notice %>
   </p>

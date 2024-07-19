@@ -4,10 +4,10 @@
       <%
         upvoted = comment.votes.any? { |v| v.user_id == current_user.id && v.value == 1 }
         downvoted = comment.votes.any? { |v| v.user_id == current_user.id && v.value == -1 }
-        upvote_class = "text-gray-400 hover:text-blue-500 transition-colors duration-200"
-        downvote_class = "text-gray-400 hover:text-blue-500 transition-colors duration-200"
-        upvote_icon_class = "fa-solid fa-chevron-up fa-lg #{upvoted ? 'text-blue-500' : ''}"
-        downvote_icon_class = "fa-solid fa-chevron-down fa-lg #{downvoted ? 'text-blue-500' : ''}"
+        upvote_class = "text-gray-400 hover:text-orange-500 transition-colors duration-200"
+        downvote_class = "text-gray-400 hover:text-orange-500 transition-colors duration-200"
+        upvote_icon_class = "fa-solid fa-chevron-up fa-lg #{upvoted ? 'text-orange-500' : ''}"
+        downvote_icon_class = "fa-solid fa-chevron-down fa-lg #{downvoted ? 'text-orange-500' : ''}"
       %>
       <%= button_to upvote_article_comment_path(@article, comment), method: :post, class: upvote_class do %>
         <i class="<%= upvote_icon_class %>" id="postup"></i>
@@ -34,7 +34,7 @@
         <div class="flex space-x-2">
           <% if user_signed_in? && current_user == comment.user %>
             <%= link_to 'Edit', edit_article_comment_path(@article, comment),
-                class: "text-blue-500 hover:text-blue-700 transition-colors duration-200" %>
+                class: "text-orange-500 hover:text-orange-700 transition-colors duration-200" %>
             <%= link_to 'Delete', article_comment_path(@article, comment), method: :delete,
                 data: { confirm: 'Are you sure?' },
                 class: "text-red-500 hover:text-red-700 transition-colors duration-200" %>

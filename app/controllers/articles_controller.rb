@@ -4,10 +4,25 @@ class ArticlesController < ApplicationController
   before_action :ensure_ownership, only: [:edit, :update, :destroy]
 
   def index
-    @articles = Article.all.order(created_at: :desc)
-    @votes = Vote.where(user: current_user , votable_type: "Article")
+    @top_tags = Tag.joins(:articles)
+    .group('tags.id')
+    .order('COUNT(articles.id) DESC')
+    .limit(4)
 
-    return @articles, @votes
+    if params[:tag].present?
+      @tag = Tag.find_by(name: params[:tag])
+      @articles = @tag ? @tag.articles.select(:id, :title, :created_at,:user_id,:summary).order(created_at: :desc).page(params[:page]).per(12) : Article.none.page(params[:page])
+    else
+      @articles = Article.select(:id, :title, :created_at,:user_id,:summary).order(created_at: :desc).page(params[:page]).per(12)
+    end
+
+
+    @votes = current_user.votes.where(votable_type: 'Article') if user_signed_in?
+    
+    respond_to do |format|
+      format.html
+      format.js
+    end
   end
 
   def show
@@ -16,6 +31,7 @@ class ArticlesController < ApplicationController
     @articles = Article.joins(:tags)
     .where('tags.name IN (?)', tag_names)
     .where.not(id: @article.id)
+    .select(:id, :title, :created_at)
     .group('articles.id')
     .having('COUNT(DISTINCT tags.id) >= 1')
     .distinct

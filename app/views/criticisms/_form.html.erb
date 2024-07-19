@@ -3,11 +3,11 @@
   <%= form_with(model: [comment, Criticism.new], url: article_comment_criticisms_path(@article, comment), local: true) do |form| %>
     <div class="mb-4">
       <%= form.text_area :content, 
-          class: "p-1 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md", 
+          class: "p-1 shadow-sm focus:ring-orange-500 focus:border-orange-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md", 
           rows: 3, 
           placeholder: "Share your thoughts..." %>
     </div>
     <%= form.submit "Submit Criticism", 
-        class: "inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out" %>
+        class: "inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition duration-150 ease-in-out" %>
   <% end %>
 </div>

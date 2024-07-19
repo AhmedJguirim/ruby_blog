@@ -1,0 +1,22 @@
+<div class="container mx-auto px-4 py-8">
+
+  <%= render 'banner', user: @user, total_votes: @total_votes, total_comments: @total_comments %>
+  
+  <h2 class="text-2xl font-bold mb-4">Theories by <%= @user.username %></h2>
+  <div class="flex justify-end mb-3 ">
+    <%= link_to articles_path(view: 'list'), class: "mr-2 p-2 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400", remote: true, id: "list-view" do %>
+      <i class="fas fa-list"></i>
+    <% end %>
+    <%= link_to articles_path(view: 'card'), class: "p-2 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400", remote: true, id: "card-view" do %>
+      <i class="fas fa-th-large"></i>
+    <% end %>
+  </div>
+  <div id="theories-container" class="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-fr">
+    
+    <%= render partial: 'articles/theory_card_item', collection: @theories, as: :theory %>
+  </div>
+
+  <div class="mt-8">
+    <%= paginate @theories %>
+  </div>
+</div>

@@ -1,0 +1,9 @@
+<% if params[:view] == 'list' %>
+  document.getElementById('theories-container').className = 'space-y-4';
+  document.getElementById('theories-container').innerHTML = '<%= j render partial: "theory_list_item", collection: @articles, as: :theory %>';
+<% else %>
+  document.getElementById('theories-container').className = 'grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-fr';
+  document.getElementById('theories-container').innerHTML = '<%= j render partial: "theory_card_item", collection: @articles, as: :theory %>';
+<% end %>
+
+document.querySelector('.pagination').outerHTML = '<%= j paginate @articles %>';

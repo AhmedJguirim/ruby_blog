@@ -1,0 +1,43 @@
+<div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
+    <div class="p-4 flex-grow">
+      <h2 class="text-xl font-bold mb-2">
+        <%= link_to theory.title, article_path(theory), class: "text-orange-600 hover:text-orange-800" %>
+      </h2>
+      <p class="text-gray-600 text-sm mb-2">By: <%= link_to theory.user.username, profile_path(theory.user), class: "hover:text-orange-500 transition-colors duration-200" %> • <%= time_ago_in_words(theory.created_at) %> ago</p>
+      <p class="text-gray-800 mb-3"><%= truncate(theory.summary, length: 200) %></p>
+      <div class="mb-2 h-8"> <!-- Fixed height for tag area -->
+        <% theory_tags = theory.tags.to_a %>
+        <% if theory_tags.any? %>
+            <div class="mb-2">
+            <% theory.tags.first(4).each do |tag| %>
+              <%= link_to "##{tag.name}", articles_path(tag: tag.name), class: "inline-block bg-gray-200 rounded-full px-2 py-1 text-xs font-semibold text-gray-700 mr-1 mb-1 hover:bg-gray-300 transition-colors duration-200" %>
+            <% end %>
+          </div>
+        <% else %>
+          <span class="text-gray-400 text-sm">No tags</span>
+        <% end %>
+      </div>
+    </div>
+    <div class="bg-gray-100 px-4 py-3 flex justify-between items-center mt-auto">
+      <span class="text-gray-600 text-sm">
+        <i class="far fa-comment mr-1"></i> <%= theory.comments.count %> Comments
+      </span>
+      <div class="flex items-center">
+        <% if user_signed_in? %>
+          <%
+            upvoted = @votes.any? { |v| v.votable_id == theory.id && v.value == 1 }
+            downvoted = @votes.any? { |v| v.votable_id == theory.id && v.value == -1 }
+            upvote_icon_class = "fa-solid fa-chevron-up#{' text-orange-500' if upvoted}"
+            downvote_icon_class = "fa-solid fa-chevron-down#{' text-orange-500' if downvoted}"
+          %>
+          <%= button_to upvote_article_path(theory), method: :post, class: "text-gray-500 hover:text-orange-500 transition-colors duration-200 mr-2" do %>
+            <i class="<%= upvote_icon_class %>"></i>
+          <% end %>
+          <span class="text-gray-600 font-bold mr-2"><%= theory.vote_total %></span>
+          <%= button_to downvote_article_path(theory), method: :post, class: "text-gray-500 hover:text-orange-500 transition-colors duration-200" do %>
+            <i class="<%= downvote_icon_class %>"></i>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
