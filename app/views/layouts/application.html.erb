@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Blog</title>
+  <title>TheoryKraft</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -12,7 +12,7 @@
     
     <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/42.0.1/ckeditor5.css" />
     
-    <link rel="icon" type="image/x-icon" href="images/favicon.ico" />
+    <link rel="icon" type="image/x-icon" href="images/tkicon.ico" />
     <script src="https://kit.fontawesome.com/64585f28ed.js" crossorigin="anonymous"></script>
 
     <%= javascript_include_tag 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js' %>
@@ -31,12 +31,13 @@
   <% if user_signed_in? %>
     <%= render 'components/nav' %>
   <% end %>
-  <p class="notice">
-    <%= notice %>
-  </p>
-  <p class="alert">
-    <%= alert %>
-  </p>
+  <% unless alert.nil? %>
+    <%= render 'components/alert_toast' %>
+  <% end %>
+  <% unless notice.nil? %>
+    <%= render 'components/notice_toast' %>
+  <% end %>
+
   <%= yield %>
   
   <script type="importmap">
@@ -58,7 +59,7 @@
         Paragraph,
         Heading
     } from 'ckeditor5';
-
+    setInterval(function(){ $(".toast").fadeOut(); }, 3000);
     ClassicEditor
         .create( document.querySelector( '#article_body' ), {
             plugins: [ Essentials, Bold, Italic, Font, Paragraph, Heading],

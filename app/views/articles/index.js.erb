@@ -6,4 +6,6 @@
   document.getElementById('theories-container').innerHTML = '<%= j render partial: "theory_card_item", collection: @articles, as: :theory %>';
 <% end %>
 
+<% # https://developer.mozilla.org/en-US/docs/Web/API/Element/outerHTML#value %>
+<% # https://stackoverflow.com/questions/12518526/what-does-the-j-function-in-rails-do %>
 document.querySelector('.pagination').outerHTML = '<%= j paginate @articles %>';

@@ -21,10 +21,23 @@
     <% if user_signed_in? %>
       <%= link_to 'New Theory', new_article_path, class: "bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mb-6 inline-block" %>
     <% end %>
-
-    <div id="theories-container" class="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-fr">
-      <%= render partial: 'theory_card_item', collection: @articles, as: :theory %>
+    <div>
+      <button id="btn-filter" class="p-2 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400">
+        <i class="fa fa-filter"></i>
+      </button>
+      <div id="tags-filter" class="mb-6  hidden mt-4">
+        <h2 class="text-xl font-semibold mb-2">Top Tags:</h2>
+        <div>
+          <% @top_tags.each do |tag| %>
+            <%= link_to "##{tag.name}: #{tag.articles_count}", articles_path(tag: tag.name), class: "inline-block bg-orange-200 bg-white text-orange-800 rounded-full px-3 py-1 text-sm font-semibold mr-2 mb-2 hover:bg-orange-300 transition-colors duration-200" %>
+          <% end %>
+        </div>
+      </div>
+      <div id="theories-container" class="mt-4 grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-fr">
+        <%= render partial: 'theory_card_item', collection: @articles, as: :theory %>
+      </div>
     </div>
+    
 
     <div class="mt-8">
       <%= paginate @articles %>
@@ -32,12 +45,15 @@
   <% else %>
     <p class="text-gray-600 text-center py-8">No theories found for this tag.</p>
   <% end %>
-  <div class="mb-6 mt-4">
-    <h2 class="text-xl font-semibold mb-2">Top Tags:</h2>
-    <div>
-      <% @top_tags.each do |tag| %>
-        <%= link_to "##{tag.name}", articles_path(tag: tag.name), class: "inline-block bg-orange-200 bg-white text-orange-800 rounded-full px-3 py-1 text-sm font-semibold mr-2 mb-2 hover:bg-orange-300 transition-colors duration-200" %>
-      <% end %>
-    </div>
-  </div>
+  
 </div>
+<script>
+  $("#btn-filter").on('click', function() {
+    if ($("#tags-filter").is(":hidden")) {
+      $("#tags-filter").removeClass('hidden');
+    }else{
+      $("#tags-filter").addClass('hidden');
+    }
+    
+  });
+</script>

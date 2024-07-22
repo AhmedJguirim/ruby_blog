@@ -2,7 +2,7 @@
 FactoryBot.define do
     factory :article do
         sequence(:title) { |n| "Article Title #{n}" }
-        body { "This is the body of the article. It needs to be at least 10 characters long." }
+        body { "This is the body of the article. It needs to be at least 75 characters long......................................................................................................................................................................................................................................" }
         summary { "A brief summary of the article." }
         association :user
         

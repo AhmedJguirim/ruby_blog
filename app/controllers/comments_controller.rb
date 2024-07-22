@@ -1,9 +1,7 @@
 class CommentsController < ApplicationController
-  before_action :authenticate_user!, except: [:index, :show]
   before_action :set_article
   before_action :set_comment, only: [:show, :edit, :update, :destroy, :upvote, :downvote]
   before_action :ensure_comment_owner, only: [:edit, :update, :destroy]
-
   def create
     @comment = @article.comments.build(comment_params)
     @comment.user = current_user

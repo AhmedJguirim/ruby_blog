@@ -1,5 +1,4 @@
 class CriticismsController < ApplicationController
-  before_action :authenticate_user! 
   before_action :set_comment
   before_action :set_criticism, only: [:destroy]
 
@@ -10,9 +9,9 @@ class CriticismsController < ApplicationController
     @criticism.user = current_user
   
     if @criticism.save
-      redirect_to @article, notice: 'Criticism was successfully added.'
+      redirect_to "#{article_path(@article)}#comment-section", notice: 'Criticism was successfully created.'
     else
-      redirect_to @article, alert: 'Error adding criticism.'
+      redirect_to "#{article_path(@article)}#comment-section", alert: 'Error creating criticism.'
     end
   end
 

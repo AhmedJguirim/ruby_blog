@@ -2,15 +2,15 @@
 # a base controller that the Restapi side of the app that provides jwt api protection methods
 module Api
     module V1
-      class BaseController < ApplicationController
-        protect_from_forgery with: :null_session
+      class BaseController < ActionController::Base
         before_action :authenticate_user!
+        protect_from_forgery with: :null_session
         respond_to :json
   
         private
   
         def authenticate_user!
-
+          
           if request.headers['Authorization'].present?
             jwt_secret = Rails.application.credentials.dig(:jwt, :secret_key)
             jwt_payload = JWT.decode(request.headers['Authorization'].split(' ').last, 
@@ -24,7 +24,7 @@ module Api
           render json: { error: 'Invalid or expired token' }, status: :unauthorized
         end
         
-        # TODO: doesn't funtion in create function
+        # TODO: doesn't work in create function
         def current_user
           @current_user ||= User.find(@current_user_id)
         end

@@ -1,13 +1,13 @@
 class ArticlesController < ApplicationController
   before_action :set_article, only: [:show, :edit, :update, :destroy, :upvote, :downvote]
-  before_action :authenticate_user!, except: [:index, :show]
   before_action :ensure_ownership, only: [:edit, :update, :destroy]
 
   def index
     @top_tags = Tag.joins(:articles)
+    .select('tags.*, COUNT(articles.id) AS articles_count')
     .group('tags.id')
-    .order('COUNT(articles.id) DESC')
-    .limit(4)
+    .order('articles_count DESC')
+    .limit(20)
 
     if params[:tag].present?
       @tag = Tag.find_by(name: params[:tag])

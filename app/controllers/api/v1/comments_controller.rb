@@ -4,7 +4,7 @@ class CommentsController < BaseController
     before_action :set_comment, only: [:show, :update, :destroy]
     before_action :ensure_owner, only: [:update, :destroy]
     #exception routes
-    skip_before_action :authenticate_user!, only: [:index, :show]
+    # skip_before_action :authenticate_user!, only: [:index, :show]
     
     def index
       @comments = Comment.all
