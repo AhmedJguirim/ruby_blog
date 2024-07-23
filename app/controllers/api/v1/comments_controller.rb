@@ -11,6 +11,11 @@ class CommentsController < BaseController
       render json: @comments
     end
 
+    def getByArticle
+      @comments = Comment.where(article_id: params['article'])
+      render json: @comments
+    end
+
     def show
       render json: @comment
     end

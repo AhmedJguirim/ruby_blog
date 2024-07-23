@@ -42,7 +42,13 @@ Rails.application.routes.draw do
         delete 'logout', to: 'sessions#destroy'
       end
       resources :articles
+
       resources :comments
+      get 'comments/articles/:article', to: 'comments#getByArticle'
+
+      get 'criticisms/:comment', to: 'criticisms#index'
+      post 'criticisms', to: 'criticisms#create'
+      delete 'criticisms/:id', to: 'criticisms#destroy'
     end
   end
 end
