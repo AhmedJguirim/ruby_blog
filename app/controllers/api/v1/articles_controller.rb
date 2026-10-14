@@ -16,21 +16,15 @@ module Api
       end
 
     def create
-      puts params
       @user = User.find(@current_user_id)
       @article = Article.new(article_params)
 
       @article.user = @user
 
       if @article.save
-        if params[:documents][:image1].present?
-          @article.documents.create(file: params[:documents][:image1])  
-        end
-        if params[:documents][:image2].present?
-          @article.documents.create(file: params[:documents][:image2])  
-        end
-        if params[:documents][:image3].present?
-          @article.documents.create(file: params[:documents][:image3])  
+        %i[image1 image2 image3].each do |key|
+          image = params.dig(:documents, key)
+          @article.documents.create(file: image) if image.respond_to?(:tempfile)
         end
         render json: @article, status: :created
       else
@@ -63,7 +57,7 @@ module Api
       @article = Article.find(params[:id])
     end
   def article_params
-    params.require(:article).permit(:title, :body, :summary,:image1,:image2,:image3)
+    params.require(:article).permit(:title, :body, :summary)
   end
 end
 end

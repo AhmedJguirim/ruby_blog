@@ -6,11 +6,11 @@ module Api
         def create
             user = User.find_by(email: params[:email])
             if user && user.valid_password?(params[:password])
-              jwt_secret = Rails.application.credentials.dig(:jwt, :secret_key)
+              jwt_secret = Rails.configuration.x.jwt_secret
               if jwt_secret.nil?
                 render json: { error: 'JWT secret key is not set' }, status: :internal_server_error
               else
-                token = JWT.encode({email: user.email, id: user.id, exp: 24.hours.from_now.to_i }, jwt_secret)
+                token = JWT.encode({email: user.email, id: user.id, exp: 24.hours.from_now.to_i }, jwt_secret, 'HS256')
                 render json: { token: token }
               end
             else
