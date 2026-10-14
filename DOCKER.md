@@ -7,7 +7,7 @@ The app uses SQLite, so there is no database container; the database file and th
 ## 1. First install
 
 ```bash
-git clone https://github.com/AhmedJguirim/ruby_blog.git /opt/ruby_blog && cd /opt/ruby_blog
+git clone https://github.com/AhmedJguirim/ruby_blog.git ~/ahmed/ruby_blog && cd ~/ahmed/ruby_blog
 scripts/init-env.sh --email you@example.com --url https://blog.example.com
 scripts/redeploy.sh        # builds and starts everything (about 5 minutes the first time)
 ```
@@ -17,6 +17,10 @@ Use `--force` to regenerate (the old file is kept as `.env.bak.<date>`), `--port
 Never commit `.env`; `.env.example` shows every variable.
 
 The first user is created from `ADMIN_EMAIL` / `ADMIN_PASSWORD` at start-up. No demo data is added.
+
+Everything (`.env`, `backups/`, `.deploy/`) stays inside the checkout, so it lives wherever you clone it. Containers and volumes are named `ruby-blog…`, so they do not clash with other compose projects on the host.
+
+**Shared server:** anyone in the `docker` group can control every container on the machine (it is effectively root), and `docker` commands show all projects. Keep `.env` and `backups/` at mode 600/700 (the scripts do), and pick a `--port` your brother's apps do not use.
 
 ## 2. Ports, TLS, firewall
 
@@ -59,7 +63,7 @@ With an `https://` URL the app redirects http to https, sets HSTS and secure coo
 
 Migrations run automatically at start (`db:prepare`). A rollback does not undo migrations; use `restore.sh` if a migration must be undone. None of the scripts runs `docker compose down -v`; do not run it by hand, it deletes the volumes.
 
-Nightly backup: `0 3 * * * cd /opt/ruby_blog && scripts/backup.sh -q`
+Nightly backup: `0 3 * * * cd $HOME/ahmed/ruby_blog && scripts/backup.sh -q`
 
 ## 4. Everyday commands
 
