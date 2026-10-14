@@ -1,7 +1,10 @@
 Rails.application.routes.draw do
-  get 'profiles/show'
-  get 'criticisms/create'
-  get 'criticisms/destroy'
+  # liveness check for the container healthcheck (no auth, no SSL redirect)
+  get 'up', to: proc {
+    ActiveRecord::Base.connection.execute('SELECT 1')
+    [200, { 'Content-Type' => 'text/plain' }, ['ok']]
+  }
+
   # https://stackoverflow.com/questions/3546289/override-devise-registrations-controller
   devise_for :users, controllers: { registrations: 'users/registrations' }
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
@@ -25,7 +28,7 @@ Rails.application.routes.draw do
     end
     resources :comments do
       resources :criticisms, only: [:create, :destroy]
-      resources :documents 
+      resources :documents, only: [:create, :destroy]
       member do
         post 'upvote'
         post 'downvote'

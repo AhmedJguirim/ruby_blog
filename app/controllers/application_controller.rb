@@ -20,7 +20,6 @@ class ApplicationController < ActionController::Base
 
   #public paths
   def auth_path?
-    params[:controller] == 'devise/sessions' || 
-    params[:controller] == 'users/registrations'
+    %w[devise/sessions users/registrations devise/passwords].include?(params[:controller])
   end
 end

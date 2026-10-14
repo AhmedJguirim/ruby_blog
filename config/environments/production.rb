@@ -41,12 +41,17 @@ Rails.application.configure do
   config.active_storage.service = :local
 
   # Mount Action Cable outside main process or domain.
-  # config.action_cable.mount_path = nil
+  # ActionCable is not used by the app; do not expose the /cable endpoint
+  config.action_cable.mount_path = nil
   # config.action_cable.url = 'wss://example.com/cable'
   # config.action_cable.allowed_request_origins = [ 'http://example.com', /http:\/\/example.*/ ]
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  # config.force_ssl = true
+  # APP_URL (e.g. https://blog.example.com) decides it: https => redirect to SSL
+  # (nginx forwards X-Forwarded-Proto), HSTS and secure cookies. /up stays reachable over http.
+  app_url = URI.parse(ENV.fetch("APP_URL", "http://localhost"))
+  config.force_ssl = app_url.scheme == "https"
+  config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
 
   # Include generic and useful information about system operation, but avoid logging too much
   # information to avoid inadvertent exposure of personally identifiable information (PII).
@@ -63,6 +68,18 @@ Rails.application.configure do
   # config.active_job.queue_name_prefix = "blog_production"
 
   config.action_mailer.perform_caching = false
+  config.action_mailer.default_url_options = { host: app_url.host, port: (app_url.port unless [80, 443].include?(app_url.port)), protocol: app_url.scheme }
+  if ENV["SMTP_ADDRESS"].present?
+    config.action_mailer.delivery_method = :smtp
+    config.action_mailer.smtp_settings = {
+      address: ENV["SMTP_ADDRESS"], port: ENV.fetch("SMTP_PORT", 587).to_i,
+      user_name: ENV["SMTP_USERNAME"].presence, password: ENV["SMTP_PASSWORD"].presence,
+      enable_starttls_auto: true
+    }
+  else
+    # no mail server configured: password-reset mails are dropped instead of raising
+    config.action_mailer.perform_deliveries = false
+  end
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
