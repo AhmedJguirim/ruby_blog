@@ -13,14 +13,14 @@ scripts/redeploy.sh        # builds and starts everything (about 5 minutes the f
 ```
 
 `init-env.sh` writes `.env` (mode 600) with random secrets and prints the first password once.
-Use `--force` to regenerate (the old file is kept as `.env.bak.<date>`), `--port` to change the port.
+Use `--force` to regenerate (the old file is kept as `.env.bak.<date>`). The port is 18090 unless something already listens there; then a random free high port is chosen (or give `--port`, which fails if it is taken). The chosen port is printed and stored as `WEB_PORT`.
 Never commit `.env`; `.env.example` shows every variable.
 
 The first user is created from `ADMIN_EMAIL` / `ADMIN_PASSWORD` at start-up. No demo data is added.
 
 Everything (`.env`, `backups/`, `.deploy/`) stays inside the checkout, so it lives wherever you clone it. Containers and volumes are named `ruby-blog…`, so they do not clash with other compose projects on the host.
 
-**Shared server:** anyone in the `docker` group can control every container on the machine (it is effectively root), and `docker` commands show all projects. Keep `.env` and `backups/` at mode 600/700 (the scripts do), and pick a `--port` your brother's apps do not use.
+**Shared server:** anyone in the `docker` group can control every container on the machine (it is effectively root), and `docker` commands show all projects. Keep `.env` and `backups/` at mode 600/700 (the scripts do), and the port check above only sees what is listening right now, so also avoid ports his apps may use later.
 
 ## 2. Ports, TLS, firewall
 
@@ -33,23 +33,19 @@ nginx listens on `${WEB_PORT}` (default **18090**) on `${BIND_ADDR}`:
 
 Docker publishes ports through its own iptables rules, **so `ufw deny 18090` does not block a port bound to `0.0.0.0`**. Keep `127.0.0.1` unless you want it open.
 
-Example for the host's own nginx (certificates e.g. from certbot):
+This project never needs ports 80 or 443. If you want a domain with TLS, add a server block to whatever already terminates TLS on the host (its owner decides that), pointing at `http://127.0.0.1:<WEB_PORT>`:
 
 ```nginx
-server {
-    listen 443 ssl;
-    server_name blog.example.com;
+location / {
     client_max_body_size 16m;
-    location / {
-        proxy_pass http://127.0.0.1:18090;
-        proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
+    proxy_pass http://127.0.0.1:18090;   # your WEB_PORT
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
 }
 ```
 
-With an `https://` URL the app redirects http to https, sets HSTS and secure cookies, and relies on `X-Forwarded-Proto`. Real client IPs (for rate limiting) come from `X-Forwarded-For`, trusted only from private addresses. Open only 80/443 and your SSH port in `ufw`.
+With an `https://` URL the app redirects http to https, sets HSTS and secure cookies, and relies on `X-Forwarded-Proto`. Real client IPs (for rate limiting) come from `X-Forwarded-For`, trusted only from private addresses. No firewall change is needed for `127.0.0.1`.
 
 ## 3. Updating
 

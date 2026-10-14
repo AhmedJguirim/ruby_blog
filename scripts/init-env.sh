@@ -6,7 +6,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 usage() { echo "Usage: $0 --email EMAIL --url URL [--port PORT] [--force]"; exit "${1:-0}"; }
 
-EMAIL=""; URL=""; PORT="18090"; FORCE=0
+EMAIL=""; URL=""; PORT=""; FORCE=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --email) EMAIL="${2:-}"; shift 2 ;;
@@ -20,7 +20,21 @@ done
 
 [[ "$EMAIL" =~ ^[^@[:space:]]+@[^@[:space:]]+\.[^@[:space:]]+$ ]] || { echo "--email must be a valid address" >&2; usage 1; }
 [[ "$URL" =~ ^https?://[^/[:space:]]+$ ]] || { echo "--url must look like https://blog.example.com (no trailing path)" >&2; usage 1; }
-[[ "$PORT" =~ ^[0-9]+$ ]] && [ "$PORT" -ge 1024 ] && [ "$PORT" -le 65535 ] || { echo "--port must be 1024-65535" >&2; usage 1; }
+port_busy() { # true if something already listens on the port (any address)
+  if command -v ss >/dev/null; then ss -H -ltn "sport = :$1" 2>/dev/null | grep -q .
+  else (exec 3<>"/dev/tcp/127.0.0.1/$1") 2>/dev/null; fi
+}
+if [ -n "$PORT" ]; then
+  [[ "$PORT" =~ ^[0-9]+$ ]] && [ "$PORT" -ge 1024 ] && [ "$PORT" -le 65535 ] || { echo "--port must be 1024-65535" >&2; usage 1; }
+  ! port_busy "$PORT" || { echo "Port $PORT is already in use on this machine; choose another with --port." >&2; exit 1; }
+else
+  PORT=18090
+  for _ in $(seq 1 50); do
+    ! port_busy "$PORT" && break
+    PORT=$((20000 + RANDOM % 30000))
+  done
+  ! port_busy "$PORT" || { echo "Could not find a free port; give one with --port." >&2; exit 1; }
+fi
 command -v openssl >/dev/null || { echo "openssl is required" >&2; exit 1; }
 
 if [ -e .env ] && [ "$FORCE" -ne 1 ]; then
