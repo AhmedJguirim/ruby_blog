@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Restore the database and the uploads from backups/ (asks first).
-#   scripts/restore.sh [-y] [--db FILE] [--uploads FILE]
+#   scripts/restore.sh [-y] [-q] [--db FILE] [--uploads FILE]
 # Without options the newest backup is used. The current data is backed up first.
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
@@ -8,6 +8,7 @@ YES=0; DB=""; UP=""
 while [ $# -gt 0 ]; do
   case "$1" in
     -y) YES=1; shift ;;
+    -q) QUIET=1; shift ;;
     --db) DB="${2:?--db needs a file}"; shift 2 ;;
     --uploads) UP="${2:?--uploads needs a file}"; shift 2 ;;
     -h|--help) sed -n '2,4p' "${BASH_SOURCE[0]}"; exit 0 ;;
@@ -46,7 +47,7 @@ gzip -dc "$DB" | dc run --rm --no-deps -T --entrypoint sh web -c \
   'rm -f "$DATABASE_PATH" "$DATABASE_PATH-wal" "$DATABASE_PATH-shm" && cat > "$DATABASE_PATH"'
 if [ -n "$UP" ]; then
   log "restoring the uploads"
-  gzip -dc "$UP" | dc run --rm --no-deps -T --entrypoint sh web -c \
+  cat "$UP" | dc run --rm --no-deps -T --entrypoint sh web -c \
     'find /rails/storage -mindepth 1 -delete && tar -xzf - -C /rails/storage'
 fi
 
