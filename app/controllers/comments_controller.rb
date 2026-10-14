@@ -6,13 +6,11 @@ class CommentsController < ApplicationController
     @comment = @article.comments.build(comment_params)
     @comment.user = current_user
 
+    @comment.build_document(file: uploaded_image) if uploaded_image
     if @comment.save
-      if params[:comment][:image].present?
-        @comment.create_document(file: params[:comment][:image])
-      end
       redirect_to "#{article_path(@article)}#comment-section", notice: 'Comment was successfully created.'
     else
-      redirect_to "#{article_path(@article)}#comment-section", alert: 'Error creating comment.'
+      redirect_to "#{article_path(@article)}#comment-section", alert: "Error creating comment: #{@comment.errors.full_messages.to_sentence}"
     end
   end
 
@@ -21,14 +19,14 @@ class CommentsController < ApplicationController
   end
   def update
     if @comment.update(comment_params)
-      if params[:comment][:image].present?
+      if uploaded_image
         if @comment.document.present?
-          @comment.document.update(file: params[:comment][:image])
+          @comment.document.update(file: uploaded_image)
         else
-          @comment.create_document(file: params[:comment][:image])
+          @comment.create_document(file: uploaded_image)
         end
       else
-        @comment.document.destroy
+        @comment.document&.destroy
       end
       redirect_to @article, notice: 'Comment was successfully updated.'
     else
@@ -59,6 +57,11 @@ class CommentsController < ApplicationController
     @comment = @article.comments.find(params[:id])
   end
 
+  def uploaded_image
+    image = params.dig(:comment, :image)
+    image if image.respond_to?(:tempfile)
+  end
+
   def comment_params
     params.require(:comment).permit(:body)
   end
@@ -73,9 +76,9 @@ class CommentsController < ApplicationController
     @vote = @comment.votes.find_or_initialize_by(user: current_user)
     @vote.value = value
     if @vote.save
-      redirect_back fallback_location: root_path, notice: 'Vote recorded successfully.'
+      redirect_back fallback_location: root_path, notice: 'Vote recorded successfully.', allow_other_host: false
     else
-      redirect_back fallback_location: root_path, alert: 'Unable to record vote.'
+      redirect_back fallback_location: root_path, alert: 'Unable to record vote.', allow_other_host: false
     end
   end
 end

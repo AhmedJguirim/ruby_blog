@@ -47,12 +47,8 @@ class ArticlesController < ApplicationController
   def create
     @article = current_user.articles.build(article_params)
 
+    uploaded_images.first(3).each { |image| @article.documents.build(file: image) }
     if @article.save
-      if params[:article][:images].present?
-        params[:article][:images].first(3).each do |image|
-          @article.documents.create(file: image)
-        end
-      end
       redirect_to @article, notice: 'Article was successfully created.'
     else
       render :new
@@ -65,14 +61,8 @@ class ArticlesController < ApplicationController
   def update
     @article.assign_attributes(article_params)
     
-    if params[:article][:images].present?
-      remaining_slots = 3 - @article.documents.count
-      new_images = params[:article][:images].first(remaining_slots)
-      
-      new_images.each do |image|
-        @article.documents.build(file: image)
-      end
-    end
+    remaining_slots = 3 - @article.documents.count
+    uploaded_images.first(remaining_slots).each { |image| @article.documents.build(file: image) }
   
     if @article.save
       redirect_to @article, notice: 'Article was successfully updated.'
@@ -112,10 +102,15 @@ class ArticlesController < ApplicationController
     @vote.value = value
 
     if @vote.save
-      redirect_back fallback_location: root_path, notice: 'Vote recorded successfully.'
+      redirect_back fallback_location: root_path, notice: 'Vote recorded successfully.', allow_other_host: false
     else
-      redirect_back fallback_location: root_path, alert: 'Unable to record vote.'
+      redirect_back fallback_location: root_path, alert: 'Unable to record vote.', allow_other_host: false
     end
+  end
+
+  # only real uploads; ignores the empty hidden field and plain strings
+  def uploaded_images
+    Array(params.dig(:article, :images)).select { |image| image.respond_to?(:tempfile) }
   end
 
   def article_params
