@@ -319,12 +319,9 @@ Devise.setup do |config|
     else
       jwt.secret = jwt_secret
     end
-    jwt.dispatch_requests = [
-      ['POST', %r{^/api/v1/login$}]
-    ]
-    jwt.revocation_requests = [
-      ['DELETE', %r{^/api/v1/logout$}]
-    ]
+    # Api::V1::SessionsController issues and revokes the tokens itself. The
+    # devise-jwt dispatch/revocation middleware would handle the same requests
+    # a second time and fail (the tokens carry no jti): logout answered 500.
     jwt.expiration_time = 1.day.to_i
   end
 end

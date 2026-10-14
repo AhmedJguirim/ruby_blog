@@ -36,12 +36,12 @@
         <%= form.file_field :images, multiple: true, accept: 'image/*', class: "sr-only", id: "file-upload" %>
       </label>
     </div>
-    <p class="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+    <p class="text-xs text-gray-500">PNG, JPG, GIF up to 5MB each</p>
     <small class="text-gray-600 mt-2 block">You can upload up to <%= 3 - @article.documents.count %> more image(s)</small>
   </div>
 
   <div id="image-preview" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-    <% article.documents.each do |document| %>
+    <% article.documents.select(&:persisted?).each do |document| %>
       <div class="relative">
         <%= image_tag url_for(document.file), class: "w-full h-48 object-cover rounded-lg" %>
         <%= link_to 'Delete', article_document_path(article, document), method: :delete, data: { confirm: 'Are you sure?' }, class: "absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600" %>

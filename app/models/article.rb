@@ -3,7 +3,7 @@ class Article < ApplicationRecord
     has_many :comments, dependent: :destroy
     has_many :elaboration_requests
     has_many :votes, as: :votable , dependent: :destroy
-    has_many :documents, as: :documentable, dependent: :destroy
+    has_many :documents, as: :documentable, dependent: :destroy, validate: false
 
     belongs_to :user
     has_and_belongs_to_many :tags
@@ -12,6 +12,7 @@ class Article < ApplicationRecord
     validates :body, presence: true, length: { minimum: 75 }
     validates :summary, presence: true, length: {minimum:25, maximum:200}
     validate :document_limit
+    validate :new_documents_valid
 
     after_save :process_tags
 
@@ -25,6 +26,15 @@ class Article < ApplicationRecord
       end
     end
     private 
+    # report why an image was rejected instead of a generic "Documents is invalid"
+    def new_documents_valid
+      documents.select(&:new_record?).each do |document|
+        next if document.valid?
+
+        document.errors.full_messages.each { |message| errors.add(:base, "Image: #{message}") }
+      end
+    end
+
     def document_limit
       if documents.count > 3
         errors.add(:base, "You can't upload more than 3 images")
