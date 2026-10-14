@@ -13,4 +13,8 @@ if Rails.env.production? && ENV["SECRET_KEY_BASE_DUMMY"].blank?
             "Generate real values with scripts/init-env.sh."
     end
   end
+
+  unless ENV["APP_URL"].to_s.match?(%r{\Ahttps?://[^/\s]+\z})
+    raise "APP_URL must look like https://blog.example.com (no path)."
+  end
 end

@@ -4,6 +4,7 @@ namespace :app do
     email = ENV["ADMIN_EMAIL"].to_s.strip.downcase
     password = ENV["ADMIN_PASSWORD"].to_s
     next puts("ADMIN_EMAIL/ADMIN_PASSWORD not set: no user created") if email.empty? || password.empty?
+    abort "ADMIN_EMAIL/ADMIN_PASSWORD still contain CHANGE_ME" if (email + password).match?(/change_?me/i)
     next puts("User #{email} already exists") if User.exists?(email: email)
 
     user = User.new(email: email, password: password, username: ENV.fetch("ADMIN_USERNAME", "admin"))

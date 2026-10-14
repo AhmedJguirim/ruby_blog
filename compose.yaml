@@ -1,0 +1,80 @@
+# Ruby Blog: nginx (published) -> Rails/Puma -> SQLite in a named volume.
+# The app uses SQLite (config/database.yml), so there is no database container.
+name: ruby-blog
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  web:
+    build:
+      context: .
+      target: web
+    image: ruby-blog-web:latest
+    restart: unless-stopped
+    init: true
+    environment:
+      APP_URL: ${APP_URL:?APP_URL is missing - run scripts/init-env.sh}
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE:?SECRET_KEY_BASE is missing - run scripts/init-env.sh}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:?JWT_SECRET_KEY is missing - run scripts/init-env.sh}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      MAIL_FROM: ${MAIL_FROM:-noreply@example.com}
+      SMTP_ADDRESS: ${SMTP_ADDRESS:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      RAILS_MAX_THREADS: ${RAILS_MAX_THREADS:-5}
+    volumes:
+      - blog_db:/data/db
+      - blog_storage:/rails/storage
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /rails/tmp:uid=1000,gid=1000
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 1g
+    cpus: 1.5
+    pids_limit: 256
+    healthcheck:
+      test: ["CMD", "ruby", "-rnet/http", "-e", "exit(Net::HTTP.get_response(URI('http://127.0.0.1:3000/up')).code == '200' ? 0 : 1)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+    logging: *logging
+
+  nginx:
+    build:
+      context: .
+      target: nginx
+    image: ruby-blog-nginx:latest
+    restart: unless-stopped
+    depends_on:
+      web:
+        condition: service_healthy
+    ports:
+      - "${BIND_ADDR:-127.0.0.1}:${WEB_PORT:-18090}:8080"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 128m
+    cpus: 0.5
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/up"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    logging: *logging
+
+volumes:
+  blog_db:
+  blog_storage:
