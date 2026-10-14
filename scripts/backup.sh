@@ -31,7 +31,7 @@ trap 'rm -f "$DB_FILE.part" "$UP_FILE.part"' EXIT
 
 log "dumping the database"
 # VACUUM INTO writes a consistent copy even while the app is writing
-dc exec -T web ruby -rsqlite3 -e '
+dc exec -T web bundle exec ruby -rsqlite3 -e '
   dst = "/tmp/backup-#{$$}.sqlite3"
   SQLite3::Database.new(ENV.fetch("DATABASE_PATH")).execute("VACUUM INTO \x27#{dst}\x27")
   STDOUT.binmode
